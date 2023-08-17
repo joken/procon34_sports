@@ -2,7 +2,20 @@
 #include <random>
 using namespace std;
 
+class printMap{
+    public:
+    void printMapInfo(string gameMap,int weightSize,int heightSize){
+        for(int i = 0; i < heightSize; i++){
+        for(int j = 0; j <weightSize; j++){
+            cout << gameMap.at(i).at(j);
+        }
+        cout << " " << endl;
+    }
+    }
+};
+
 int main(){
+    printMap out;
 
     int v1 = rand() % 10 +1;
     int v2 = rand() % 10 +1;
@@ -26,23 +39,7 @@ int main(){
     map.at(rand() % 10).at(rand() % 10) = "e2 ";
     map.at(rand() % 10).at(rand() % 10) = "e3 ";
 
-    for(int i = 0; i < v1; i++){
-        for(int j = 0; j <v2; j++){
-            cout << map.at(i).at(j);
-        }
-        cout << " " << endl;
-    }
+    out.printMapInfo(map[v1][v2],v1,v2);
+
     cout << v1 << v2 <<endl;
 }
-
-class printScrean{
-    public:
-    void printSc(char gameMap[][]){
-        for(int i = 0; i < 2; i++){
-        for(int j = 0; j <2; j++){
-            cout << gameMap.at(i).at(j);
-        }
-        cout << " " << endl;
-    }
-    }
-};
