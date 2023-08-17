@@ -34,3 +34,15 @@ int main(){
     }
     cout << v1 << v2 <<endl;
 }
+
+class printScrean{
+    public:
+    void printSc(char gameMap[][]){
+        for(int i = 0; i < 2; i++){
+        for(int j = 0; j <2; j++){
+            cout << gameMap.at(i).at(j);
+        }
+        cout << " " << endl;
+    }
+    }
+};
