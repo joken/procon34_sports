@@ -14,6 +14,8 @@ class printMap{
     }
 };
 
+class 
+
 int main(){
     printMap out;
 
