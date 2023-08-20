@@ -2,11 +2,21 @@
 #include <random>
 using namespace std;
 
-class printMap{
+class bourdInfomation{
 
 public:
+    void setBourd(string gameMap[],int widthSize, int heightSize){
+        for (int i = 0; i < heightSize; i++){
+        for (int j = 0; j < widthSize; j++){
 
-    void printMapInfo(string gameMap[], int widthSize, int heightSize){
+            gameMap[i][j] = "* ";
+
+        }
+    }
+
+    }
+
+    void printBourdInfo(string gameMap[], int widthSize, int heightSize){
         for (int i = 0; i < heightSize; i++){
             for (int j = 0; j < widthSize; j++){
 
@@ -29,20 +39,14 @@ public:
 };
 
 int main(){
-    printMap out;
+    bourdInfomation out;
 
     int v1 = rand() % 10 + 1;
     int v2 = rand() % 10 + 1;
 
-    string map[v1][v2];
+    std::string map[v1][v2];
 
-    for (int i = 0; i < v1; i++){
-        for (int j = 0; j < v2; j++){
-
-            map[i][j] = "* ";
-
-        }
-    }
+    out.setBourd(map[v1],v1,v2);
 
     map[rand() % 10][rand() % 10] = "c1 ";
     map[rand() % 10][rand() % 10] = "c2 ";
@@ -55,8 +59,8 @@ int main(){
     map[rand() % 10][rand() % 10] = "e2 ";
     map[rand() % 10][rand() % 10] = "e3 ";
 
-    out.printMapInfo(map[v2], v1, v2);
+    out.printBourdInfo(map[v1], v1, v2);
 
     std::cout << v1 << v2 << std::endl;
-    
+
 }
