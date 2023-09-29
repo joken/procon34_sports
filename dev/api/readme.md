@@ -31,6 +31,120 @@ int main(){
     cout << a.postActionPlan(sendData) << endl;    
 }
 ```
+### コンパイル
+```
+$ g++ main.cpp -lcurl
+```
+
+## 出力結果
+### 試合一覧を取得
+#### 成功時
+```json 成功時
+{
+    "matches": [
+        {
+            "board": {
+                "height": 11,
+                "mason": 2,
+                "masons": [
+                    [
+                        0
+                    ]
+                ],
+                "structures": [
+                    [
+                        0
+                    ]
+                ],
+                "width": 11
+            },
+            "bonus": {
+                "castle": 100,
+                "territory": 30,
+                "wall": 10
+            },
+            "first": true,
+            "id": 10,
+            "opponent": "後攻チーム",
+            "turnSeconds": 5,
+            "turns": 30
+        }
+    ],
+    "message": "succeeded",
+    "status_code": 0
+}
+
+```
+#### 失敗時
+```json
+{
+    "message": "failed",
+    "status_code": 28
+}
+```
+
+--- 
+
+### 試合情報取得
+#### 成功時
+```json
+{
+    "board": {
+        "height": 11,
+        "mason": 2,
+        "masons": [
+            [
+               0
+            ]
+        ],
+        "structures": [
+            [
+                0
+            ]
+        ],
+        "territories": [
+            [
+                0
+            ]
+        ],
+        "walls": [
+            [
+                0
+            ]
+        ],
+        "width": 11
+    },
+    "id": 10,
+    "logs": [],
+    "message": "succeeded",
+    "status_code": 0,
+    "turn": 0
+}
+```
+#### 失敗時
+```json
+{
+    "message": "failed",
+    "status_code": 28
+}
+```
+---
+### 行動計画送信
+#### 成功時
+```json
+{
+    "accepted_at": 1695990218182,
+    "message": "succeeded",
+    "status_code": 0
+}
+```
+#### 失敗時
+```json
+{
+    "message": "failed",
+    "status_code": 28
+}
+```
 
 ## フィールド
 ※ 全てprivate
@@ -72,6 +186,8 @@ log記録のために使用
 ### `WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)`
 
 #### おまじない
+
+---
 
 ### `get(string url)`
 #### 引数 
@@ -167,6 +283,51 @@ IDのsetter
 試合の詳細をgetし，jsonで返す．
 この時，そのファイルが `MatchesInfo-HHMMSS.json`で保存される
 
+#### 保存内容
+##### 成功時
+```json 成功時
+{
+    "matches": [
+        {
+            "board": {
+                "height": 11,
+                "mason": 2,
+                "masons": [
+                    [
+                        0
+                    ]
+                ],
+                "structures": [
+                    [
+                        0
+                    ]
+                ],
+                "width": 11
+            },
+            "bonus": {
+                "castle": 100,
+                "territory": 30,
+                "wall": 10
+            },
+            "first": true,
+            "id": 10,
+            "opponent": "後攻チーム",
+            "turnSeconds": 5,
+            "turns": 30
+        }
+    ],
+    "message": "succeeded",
+    "status_code": 0
+}
+
+```
+##### 失敗時
+```json
+{
+    "message": "failed",
+    "status_code": 28
+}
+```
 ---
 
 ### `getMatcheInfo()`
@@ -177,7 +338,50 @@ IDのsetter
 #### 処理内容
 現在の試合の状況を取得しjsonデータで返す．
 この時， `./{試合id}`ディレクトリに `{turn}.json`のファイル名で保存される
-
+#### 保存内容
+##### 成功時
+```json
+{
+    "board": {
+        "height": 11,
+        "mason": 2,
+        "masons": [
+            [
+               0
+            ]
+        ],
+        "structures": [
+            [
+                0
+            ]
+        ],
+        "territories": [
+            [
+                0
+            ]
+        ],
+        "walls": [
+            [
+                0
+            ]
+        ],
+        "width": 11
+    },
+    "id": 10,
+    "logs": [],
+    "message": "succeeded",
+    "status_code": 0,
+    "turn": 0
+}
+```
+##### 失敗時
+```json
+{
+    "message": "failed",
+    "status_code": 28
+}
+```
+---
 ### `postActionPlan(json j)`
 #### 引数
 - json j :送る職人ごとの行動計画
@@ -186,6 +390,7 @@ IDのsetter
 
 #### 処理内容
 行動計画を現在の試合idへと送信する
+
 
 ---
 
@@ -206,7 +411,23 @@ $i$番の職人の行動計画は `ActionPlan[i]`にあり，
 
 #### 処理内容
 2次元配列をjsonファイルに変換する
-
+#### 保存内容
+##### 成功時
+```json
+{
+    "accepted_at": 1695990218182,
+    "message": "succeeded",
+    "status_code": 0
+}
+```
+##### 失敗時
+```json
+{
+    "message": "failed",
+    "status_code": 28
+}
+```
+---
 ## ステータスコード(`status_code`)一覧
 |コード|message|内容|
 |----|----|---|
