@@ -3,7 +3,7 @@
 - g++ (Ubuntu 13.1.0-8ubuntu1~20.04.2) 13.1.0
 - [nlohmann-json3](https://github.com/nlohmann/json)
 ```bash
-$ sudo apt-get install libcurl4-openssl-dev
+$ sudo apt install nlohmann-json3-dev
 ```
 - [libcurl](https://github.com/curl/curl)
 ```bash
