@@ -9,7 +9,7 @@ $ sudo apt install nlohmann-json3-dev
 ```bash
 $ sudo apt-get install libcurl4-openssl-dev
 ```
-
+※openssl版以外は動作未確認
 ## 使用例
 ```cpp Main.cpp
 int main(){
