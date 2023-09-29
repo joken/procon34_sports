@@ -73,7 +73,7 @@ class API{
                     j["status_code"] = res;
                     j["message"] = "succeeded";
                 }else{                    // 接続エラー
-                    string message =  "failed:" +to_string(*curl_easy_strerror(res)) ;
+                    string message =  "failed"  ;
                     j["message"] = message;
                     cout << "failed:" << curl_easy_strerror(res) << endl;
                     j["status_code"] = res;
@@ -142,7 +142,7 @@ class API{
                         UNIXTIME = j["accepted_at"];
                     }
                 }else{                      // 接続エラー
-                    string message =  "failed:" +to_string(*curl_easy_strerror(res)) ;
+                    string message =  "failed"  ;
                     j["message"] = message;
                     cout << "failed:" << curl_easy_strerror(res) << endl;
                     j["status_code"] = res;
