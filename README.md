@@ -8,4 +8,6 @@
 - ./dev/api   : API開発環境
 - ./dev/ai    : 職人AI開発環境
 - ./dev/gui   : GUI開発環境
+- ./dev/Wall_tactics : 城郭planner開発環境
+- ./dev/mainstream   : ゲーム進行開発環境
 
