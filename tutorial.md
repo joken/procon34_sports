@@ -30,7 +30,7 @@ githubとgitを使ってチーム開発する時の軽いガイド的なやつ�
 
 ## リモートリポジトリへpushする
 作業しているブランチが煮詰まったらリモートに変更を反映させる．
-- `$ git push main feature/[new breanch name]`
+- `$ git push origin feature/[new breanch name]`
 
 
 ## プルリクエストを送る(あまり経験ないから内容が怪しい)
