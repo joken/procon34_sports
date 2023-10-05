@@ -546,18 +546,18 @@ int calcTerritoryPoint(fieldmap const *map, wallplan const *plan){
 
 
 
-int main(){
-    // 1.マップ情報の取得
-    fieldmap map = getmap();
-    showMap(&map);
+// int main(){
+//     // 1.マップ情報の取得
+//     fieldmap map = getmap();
+//     showMap(&map);
     
-    // 2.城郭の計画を立案
-    wallplan plan = planning(&map);
-    showPlan(&plan);
+//     // 2.城郭の計画を立案
+//     wallplan plan = planning(&map);
+//     showPlan(&plan);
 
-    // 3.城郭の得点計算
-    int point = calcTerritoryPoint(&map, &plan);
-    std::cout << "point : " << point << std::endl;
+//     // 3.城郭の得点計算
+//     int point = calcTerritoryPoint(&map, &plan);
+//     std::cout << "point : " << point << std::endl;
 
-    return 0;
-}
+//     return 0;
+// }
