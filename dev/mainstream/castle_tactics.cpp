@@ -30,7 +30,7 @@ void alart(int a1, int a2){
 // * None : 000(2)
 // * 味方領地 : 0X1(2)
 // * 相手領地 : 01X(2)
-// * 城壁 : 1XX(2)
+// -- * 城壁 : 1XX(2)
 struct fieldmap{
     int width; //11~25
     int height;//11~25
@@ -39,7 +39,8 @@ struct fieldmap{
     int territoryRate;
     int wallRate;
     std::vector<std::vector<int> > area;
-    std::vector<std::vector<int> > objects;
+    std::vector<std::vector<int> > masons;
+    std::vector<std::vector<int> > walls;
     std::vector<std::vector<int> > territory;
 };
 
@@ -57,9 +58,11 @@ struct wallplan{
 // 上から時計回り
 int dx4[4] = {0, 1, 0, -1};
 int dy4[4] = {1, 0, -1, 0};
+// 左上から時計回り
+int dx8[8] = {1, 0, -1, -1, -1, 0, 1, 1};
+int dy8[8] = {1, 1, 1, 0, -1, -1, -1, 0};
 
-int dx8[8] = {0, 1, 1, 1, 0, -1, -1, -1};
-int dy8[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -70,67 +73,67 @@ int random(int low, int high)
     return dist(gen);
 }
 
-fieldmap getmap(){ //ダミーデータ
-    fieldmap map = {
-        11,
-        11,
-        2,
-        100,
-        30,
-        10,
-        std::vector<std::vector<int> > {
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,1,0,0,1,0,1,0,0,1,0},
-            {0,0,2,0,0,1,0,0,2,0,0},
-            {0,0,0,1,0,0,0,1,0,0,0},
-            {0,1,0,0,2,0,2,0,0,1,0},
-            {0,0,1,0,0,1,0,0,1,0,0},
-            {0,1,0,0,2,0,2,0,0,1,0},
-            {0,0,0,1,0,0,0,1,0,0,0},
-            {0,0,2,0,0,1,0,0,2,0,0},
-            {0,1,0,0,1,0,1,0,0,1,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-        },
-        std::vector<std::vector<int> > {
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,1,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,-1,0,0,0,0,0,0,0,-2,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,2,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-        },
-        std::vector<std::vector<int> > {
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-            {0,0,0,0,0,0,0,0,0,0,0},
-        },
-    };
-    return map;
-}
+// fieldmap getmap(){ //ダミーデータ
+//     fieldmap map = {
+//         11,
+//         11,
+//         2,
+//         100,
+//         30,
+//         10,
+//         std::vector<std::vector<int> > {
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,1,0,0,1,0,1,0,0,1,0},
+//             {0,0,2,0,0,1,0,0,2,0,0},
+//             {0,0,0,1,0,0,0,1,0,0,0},
+//             {0,1,0,0,2,0,2,0,0,1,0},
+//             {0,0,1,0,0,1,0,0,1,0,0},
+//             {0,1,0,0,2,0,2,0,0,1,0},
+//             {0,0,0,1,0,0,0,1,0,0,0},
+//             {0,0,2,0,0,1,0,0,2,0,0},
+//             {0,1,0,0,1,0,1,0,0,1,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//         },
+//         std::vector<std::vector<int> > {
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,1,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,-1,0,0,0,0,0,0,0,-2,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,2,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//         },
+//         std::vector<std::vector<int> > {
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//             {0,0,0,0,0,0,0,0,0,0,0},
+//         },
+//     };
+//     return map;
+// }
 
-std::vector<std::pair<int, int> > getMasons(fieldmap const *map, int n/*職人の人数*/){
+std::vector<std::pair<int, int> > getMasons(fieldmap const *map){
     int width = map->width;
     int height = map->height;
 
-    std::vector<std::pair<int, int>> masons = std::vector<std::pair<int, int>>(n);
+    std::vector<std::pair<int, int>> masons = std::vector<std::pair<int, int>>(map->masonNum);
 
     for(int i = 0; i < width; i++){
         for(int j =0; j < height; j++){
-            if(map->objects[i][j] > 0){
-                masons[map->objects[i][j] -1] = std::make_pair(i, j);
+            if(map->masons[i][j] > 0){
+                masons[map->masons[i][j] -1] = std::make_pair(i, j);
             }
         }
     }
@@ -166,8 +169,8 @@ void showMap(fieldmap const *map){
         }
         std::cout << std::endl;
     }
-    std::cout << "--- objects ---" << std::endl;
-    for(std::vector<int> obj : map->objects){
+    std::cout << "--- masons ---" << std::endl;
+    for(std::vector<int> obj : map->masons){
         for(int c : obj){
             char cell = ' ';
             if(c == 0){
@@ -182,6 +185,26 @@ void showMap(fieldmap const *map){
                 cell = 'E';
             }else{
                 cell = 'X';
+            }
+            std::cout << cell;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "--- walls ---" << std::endl;
+    for(std::vector<int> obj : map->walls){
+        for(int c : obj){
+            char cell = ' ';
+            switch (c){
+            case 0: //None
+                cell = '.'; break;
+            case 1: //自陣
+                cell = 'f'; break;
+            case 2: //相手陣
+                cell = 'e'; break;
+            default: //その他
+                // cell = '.';
+                cell = '@';
+                break;
             }
             std::cout << cell;
         }
@@ -271,7 +294,7 @@ wallplan planning(fieldmap const *map){
     //既存の壁をコピー
     for(int i = 0; i < width; i++){
         for(int j = 0; j < height; j++){
-            if((map->territory[i][j] & 1) == 1){
+            if(map->walls[i][j] == 1){
                 plan.walls[i][j] = 1;
             }
         }
@@ -361,7 +384,7 @@ wallplan planning(fieldmap const *map){
             plan.walls[x][y] = 2; //境界の壁を正式な壁(仮)に変更
         }
     }
-    showPlan(&plan);
+    // showPlan(&plan);
 
     //この段階で 既壁 : 1, 仮壁 : 3, 領域 : 4　で案ができている.
     //線状の仮壁を削除
