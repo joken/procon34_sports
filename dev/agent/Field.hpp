@@ -18,11 +18,11 @@ struct wallplan{
 
 //　近傍のマクロ
 // 上から時計回り
-int dx4[4] = {0, 1, 0, -1};
-int dy4[4] = {1, 0, -1, 0};
+int dx4[4] = {-1, 0, 1, 0};
+int dy4[4] = {0, 1, 0, -1};
 
-int dx8[8] = {0, 1, 1, 1, 0, -1, -1, -1};
-int dy8[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+int dx8[8] = {-1, -1, -1, 0, 1, 1, 1, 0};
+int dy8[8] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -232,7 +232,7 @@ class Field{
             std::cout << "=========================" << std::endl;
         }
         wallplan planning();
-        int Field::calcTerritoryPoint(wallplan const *plan);
+        int calcTerritoryPoint(wallplan const *plan);
         
         int getWidth(){
             return this->width;
