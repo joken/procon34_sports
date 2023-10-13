@@ -19,6 +19,7 @@ class Agent{
         Agent(int id, std::pair<int, int> position){
             this->id = id;
             this->position = position;
+            this->target = std::make_pair(0,0);
         }
         std::vector<int> action(Field *map, wallplan *plan);
         void erase(std::vector<int> &v, int key);

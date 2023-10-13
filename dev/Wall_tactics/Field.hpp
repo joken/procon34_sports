@@ -18,11 +18,11 @@ struct wallplan{
 
 //　近傍のマクロ
 // 上から時計回り
-int dx4[4] = {0, 1, 0, -1};
-int dy4[4] = {1, 0, -1, 0};
+int dx4[4] = {-1, 0, 1, 0};
+int dy4[4] = {0, 1, 0, -1};
 
-int dx8[8] = {0, 1, 1, 1, 0, -1, -1, -1};
-int dy8[8] = {1, 1, 0, -1, -1, -1, 0, 1};
+int dx8[8] = {-1, -1, -1, 0, 1, 1, 1, 0};
+int dy8[8] = {-1, 0, 1, 1, 1, 0, -1, -1};
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -231,14 +231,22 @@ class Field{
             }
             std::cout << "=========================" << std::endl;
         }
+        void showFriendMasons(){
+            std::cout << "--- friend masons ---" << std::endl;
+            for(int i = 0; i < this->masonNum; i++){
+                std::cout << i << " : (" << this->friendMasons[i].first << " , " << this->friendMasons[i].second << ")";
+                std::cout << std::endl;
+            }
+        }
         wallplan planning();
-        int Field::calcTerritoryPoint(wallplan const *plan);
+        int calcTerritoryPoint(wallplan const *plan);
         int getWidth(){
             return this->width;
         };
         int getHeight(){
             return this->height;
         };
+
         
 };
 
@@ -411,7 +419,7 @@ wallplan Field::planning(){
             plan.walls[x][y] = 2; //境界の壁を正式な壁(仮)に変更
         }
     }
-    showPlan(&plan);
+    // showPlan(&plan);
 
     //この段階で 既壁 : 1, 仮壁 : 3, 領域 : 4　で案ができている.
     //線状の仮壁を削除
