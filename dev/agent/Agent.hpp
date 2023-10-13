@@ -10,11 +10,11 @@ class Agent{
         int id;  // agentの番号(Unique)
         std::pair<int, int> position;
         std::pair<int, int> target;
-    public:
+
         void nearWalls(Field *map, wallplan *plan);
         std::vector<int> builderAction(Field *map, wallplan *plan);
     
-    // public:
+    public:
         Agent(int id, std::pair<int, int> position){
             this->id = id;
             this->position = position;
