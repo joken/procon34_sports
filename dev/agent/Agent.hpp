@@ -83,6 +83,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
     int width = map->getWidth();
     int height = map->getHeight();
     std::vector<std::vector<int> > walls = map->getWalls();
+    std::vector<std::vector<int> > area  = map->getArea();
     
     int dx = this->target.first - this->position.first;
     int dy = this->target.second - this->position.second;
@@ -111,11 +112,12 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
         }
     }else{
         int action = 1; //移動
-        int dir = ((int)(-atan2(dx, dy)*4/M_PI +17) % 8) + 1;
-        int x = position->first;
-        int y = position->second;
+        auto dir = ((int)(atan2(dx, dy)*4/M_PI/*[0,2π)から[0, 8)へ*/ + 8/*負の角度を排除*/ + 3.5) % 8);
+        // int dir = ((int)(-atan2(dx, dy)*4/M_PI +17) % 8) + 1;
+        int x = this->position.first;
+        int y = this->position.second;
         // 壁に沿うように移動する
-        if(map->area[x + dx8[dir]][y + dy8[dir]] > 0){
+        if(area[x + dx8[dir]][y + dy8[dir]] > 0){
             int rdir = ((LastDir -1)+4 % 8) + 1;
             if(dir == 1){                       // 左上に壁がある
                 vector<int> d = {2,3,8};        // 上か左か右上
@@ -134,7 +136,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
                 erase(d, rdir);
                 dir = d[random(0,d.size()-1)];
             }else if(dir == 2 || dir == 6){     //上に壁があるとき
-                vector<int> d = {4,8}           // 右か左
+                vector<int> d = {4,8};           // 右か左
                 erase(d, rdir);
                 dir = d[random(0,d.size()-1)]; 
             }else if(dir == 4 || dir == 8){     // 左右に壁があるとき
@@ -147,7 +149,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
         return std::vector<int>(action, dir);
     }
     LastDir = 2*random(1, 4);
-    return std::vector<int>(1,Lastdir );//最後まで来たらrandom移動
+    return std::vector<int>(1,this->LastDir );//最後まで来たらrandom移動
 }
 
 std::vector<int> Agent::action(Field *map, wallplan *plan){
