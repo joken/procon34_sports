@@ -1,0 +1,13 @@
+version: "3"
+services:
+  procon-server: #サービス名
+    build: . # dockerイメージをbuildするディレクトリ指定(Dockerfileのあるディレクトリ)
+    image: pr-sv # dockerイメージ名
+    container_name: server # コンテナ名
+    ports:
+      - 3000:3000 # ポート接続 <メインOS側のポート>:<コンテナ内からのポート>
+    # volumes:
+    #   - ./webpage/src:/app/src # 共有フォルダ(要検索)
+    command: ./procon-server_linux -c setting.json -start 1s -l :3000 # コンテナ内での実行コマンド(要検索)
+    tty: true 
+    # working_dir: /app/
