@@ -89,7 +89,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
     int dy = this->target.second - this->position.second;
 
     if(dx == 0 && dy == 0){
-        return std::vector<int>(1, 2*random(1, 4));
+        return std::vector<int>{1, 2*random(1, 4)};
     }if(abs(dx) <= 1 && abs(dy) <= 1){
         //壁がおける場合
         int x = this->position.first;
@@ -107,7 +107,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
                 if(walls[nx][ny] == 2){ // 相手の壁の時
                     action = 3;
                 }
-                return std::vector<int>(action, dir);
+                return std::vector<int>{action, dir};
             }
         }
     }else{
@@ -149,7 +149,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
         return std::vector<int>(action, dir);
     }
     LastDir = 2*random(1, 4);
-    return std::vector<int>(1,this->LastDir );//最後まで来たらrandom移動
+    return std::vector<int>{1,this->LastDir};//最後まで来たらrandom移動
 }
 
 std::vector<int> Agent::action(Field *map, wallplan *plan){

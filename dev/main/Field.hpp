@@ -65,16 +65,16 @@ class Field{
 
         void updateFriendMasons();
     public:
-        Field(json js){
-                this->width = (int)js["matches"][0]["board"]["width"];
-                this->height= (int)js["matches"][0]["board"]["height"];
-                this->masonNum = (int)js["matches"][0]["board"]["mason"];
-                this->castleRate    = (int)js["matches"][0]["bonus"]["castle"];
-                this->territoryRate = (int)js["matches"][0]["bonus"]["territory"];
-                this->wallRate      = (int)js["matches"][0]["bonus"]["wall"];
+        Field(json js, int num){
+                this->width = (int)js["matches"][num]["board"]["width"];
+                this->height= (int)js["matches"][num]["board"]["height"];
+                this->masonNum = (int)js["matches"][num]["board"]["mason"];
+                this->castleRate    = (int)js["matches"][num]["bonus"]["castle"];
+                this->territoryRate = (int)js["matches"][num]["bonus"]["territory"];
+                this->wallRate      = (int)js["matches"][num]["bonus"]["wall"];
                 
-                this->area = vector<vector<int> >(js["matches"][0]["board"]["structures"]); 
-                this->masons = vector<vector<int> >(js["matches"][0]["board"]["masons"]); 
+                this->area = vector<vector<int> >(js["matches"][num]["board"]["structures"]); 
+                this->masons = vector<vector<int> >(js["matches"][num]["board"]["masons"]); 
                 this->walls = vector<vector<int> >(this->width, vector<int>(this->height, 0));
                 this->territory = vector<vector<int> >(this->width, vector<int>(this->height, 0));
                 updateFriendMasons();
@@ -231,6 +231,52 @@ class Field{
             }
             std::cout << "=========================" << std::endl;
         }
+        void showMasons(){
+            std::cout << "--- masons ---" << std::endl;
+            for(std::vector<int> obj : this->masons){
+                for(int c : obj){
+                    char cell = ' ';
+                    if(c == 0){
+                        cell = '.';
+                    }else if(c == 9){
+                        cell = 'f';
+                    }else if(c > 0){
+                        cell = 'F';
+                    }else if(c == -9){
+                        cell = 'e';
+                    }else if(c < 0){
+                        cell = 'E';
+                    }else{
+                        cell = 'X';
+                    }
+                    std::cout << cell;
+                }
+                std::cout << std::endl;
+            }
+
+        }
+        void showWalls(){
+            std::cout << "--- walls ---" << std::endl;
+            for(std::vector<int> obj : this->walls){
+                for(int c : obj){
+                    char cell = ' ';
+                    switch (c){
+                    case 0: //None
+                        cell = '.'; break;
+                    case 1: //自陣
+                        cell = 'f'; break;
+                    case 2: //相手陣
+                        cell = 'e'; break;
+                    default: //その他
+                        // cell = '.';
+                        cell = '@';
+                        break;
+                    }
+                    std::cout << cell;
+                }
+                std::cout << std::endl;
+            }
+        }
         wallplan planning();
         int calcTerritoryPoint(wallplan const *plan);
         int updateField(API *api);
@@ -240,6 +286,9 @@ class Field{
         }
         int getHeight(){
             return this->height;
+        }
+        int getMasonNum(){
+            return this->masonNum;
         }
         
         std::vector<std::vector<int> > getArea(){
@@ -253,6 +302,9 @@ class Field{
         }
         std::vector<std::vector<int> > getWerritory(){
             return this->territory;
+        }
+        std::vector<std::pair<int, int> > getFrientMasons(){
+            return this->friendMasons;
         }
 };
 
@@ -425,7 +477,7 @@ wallplan Field::planning(){
             plan.walls[x][y] = 2; //境界の壁を正式な壁(仮)に変更
         }
     }
-    showPlan(&plan);
+    // showPlan(&plan);
 
     //この段階で 既壁 : 1, 仮壁 : 3, 領域 : 4　で案ができている.
     //線状の仮壁を削除
@@ -573,8 +625,8 @@ int Field::updateField(API *api){
     this->territory = vector<vector<int> >(matchData["board"]["territories"]);
     // for(int i = 0; i < map->width; i++){
     //     for(int j = 0; j < map->height; j++){
-    //         map->masons[i][j] = (int)matchData["matches"][0]["board"]["masons"][i][j];
-    //         map->walls[i][j] = (int)matchData["matches"][0]["board"]["walls"][i][j];
+    //         map->masons[i][j] = (int)matchData["matches"][num]["board"]["masons"][i][j];
+    //         map->walls[i][j] = (int)matchData["matches"][num]["board"]["walls"][i][j];
     //     }
     // }
     return (int)matchData["turn"];
