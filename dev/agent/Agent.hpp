@@ -10,6 +10,7 @@ class Agent{
         int id;  // agentの番号(Unique)
         std::pair<int, int> position;
         std::pair<int, int> target;
+        int LastDir;
 
         void nearWalls(Field *map, wallplan *plan);
         std::vector<int> builderAction(Field *map, wallplan *plan);
@@ -20,6 +21,7 @@ class Agent{
             this->position = position;
         }
         std::vector<int> action(Field *map, wallplan *plan);
+        void erase(std::vector<int> &v, int key);
 };
 
 void Agent::nearWalls(Field *map, wallplan *plan){
@@ -109,6 +111,36 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
     }else{
         int action = 1; //移動
         int dir = ((int)(-atan2(dx, dy)*4/M_PI +17) % 8) + 1;
+        int x = position->first;
+        int y = position->second;
+        // 壁に沿うように移動する
+        if(map->area[x + dx8[dir]][y + dy8[dir]] > 0){
+            if(dir == 1){                       // 左上に壁がある
+                vector<int> d = {2,3,8};        // 上か左か右上
+                erase(d, LastDir);
+                dir = d[random(0,d.size()-1)];
+            }else if(dir == 3){                 // 右上に壁がある
+                vector<int> d = {1,2,4};        // 上か右か左上
+                erase(d, LastDir);
+                dir = d[random(0,d.size()-1)];
+            }else if(dir == 5){                 // 右下に壁がある
+                vector<int> d = {5,6,8};        // 下か左か右下
+                erase(d, LastDir);
+                dir = d[random(0,d.size()-1)];
+            }else if(dir == 7){                 // 左下に壁がある
+                vector<int> d = {5,6,8};        // 下か左か右下
+                erase(d, LastDir);
+                dir = d[random(0,d.size()-1)];
+            }else if(dir == 2 || dir == 6){     //上に壁があるとき
+                vector<int> d = {4,8}           // 右か左
+                erase(d, LastDir);
+                dir = d[random(0,d.size()-1)]; 
+            }else if(dir == 4 || dir == 8){     // 左右に壁があるとき
+                vector<int> d = {2,6};          // 上か下
+                erase(d, LastDir);
+                dir = d[random(0,d.size()-1)];
+            }
+        }
         return std::vector<int>(action, dir);
     }
 
@@ -119,6 +151,18 @@ std::vector<int> Agent::action(Field *map, wallplan *plan){
     nearWalls(map, plan);
 
     return builderAction(map, plan);
+}
+
+void erase(std::vector<int> &v, int key){
+    for (auto it = v.begin(); it != v.end();)
+    {
+        if (*it == key) {
+            it = v.erase(it);
+        }
+        else {
+            ++it;
+        }
+    }
 }
 
 #endif // AGENT_HPP

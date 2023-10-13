@@ -78,11 +78,37 @@ std::vector<int> builderAction(std::pair<int, int> *position, std::pair<int, int
     }else{
         int action = 1; //移動
         int dir = ((int)(-atan2(dx, dy)*4/M_PI +17) % 8) + 1;
+        int x = position->first;
+        int y = position->second;
+        // 壁に沿うように移動する
+        if(map->area[x + dx8[dir]][y + dy8[dir]] > 0){
+            if(dir == 1){                       // 左上に壁がある
+                vector<int> d = {2,3,8};        // 上か左か右上
+                dir = d[random(0,2)];
+            }else if(dir == 3){                 // 右上に壁がある
+                vector<int> d = {1,2,4};        // 上か右か左上
+                dir = d[random(0,2)];
+            }else if(dir == 5){                 // 右下に壁がある
+                vector<int> d = {5,6,8};        // 下か左か右下
+                dir = d[random(0,2)];
+            }else if(dir == 7){                 // 左下に壁がある
+                vector<int> d = {5,6,8};        // 下か左か右下
+                dir = d[random(0,2)];
+            }else if(dir == 2 || dir == 6){     //上に壁があるとき
+                vector<int> d = {4,8};
+                dir = d[random(0,1)]; // 右か左
+            }else if(dir == 4 || dir == 8){     // 左右に壁があるとき
+                vector<int> d = {2,6};
+                dir = d[random(0,1)];// 上か下
+            }
+        }
         return std::vector<int>(action, dir);
     }
 
     return std::vector<int>(1, 2*random(1, 4));//最後まで来たらrandom移動
 }
+
+
 
 std::vector<int> agentAction(std::pair<int, int> *position, fieldmap *map, wallplan *plan){
     std::pair<int, int> target = nearWalls(position, map, plan);
