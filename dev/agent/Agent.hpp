@@ -152,7 +152,7 @@ std::vector<int> Agent::action(Field *map, wallplan *plan){
 
     return builderAction(map, plan);
 }
-
+// 配列要素の削除
 void erase(std::vector<int> &v, int key){
     for (auto it = v.begin(); it != v.end();)
     {
