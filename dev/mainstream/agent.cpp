@@ -82,24 +82,31 @@ std::vector<int> builderAction(std::pair<int, int> *position, std::pair<int, int
         int y = position->second;
         // 壁に沿うように移動する
         if(map->area[x + dx8[dir]][y + dy8[dir]] > 0){
+            int rdir = ((LastDir -1)+4 % 8) + 1;
             if(dir == 1){                       // 左上に壁がある
                 vector<int> d = {2,3,8};        // 上か左か右上
-                dir = d[random(0,2)];
+                erase(d, rdir);
+                dir = d[random(0,d.size()-1)];
             }else if(dir == 3){                 // 右上に壁がある
                 vector<int> d = {1,2,4};        // 上か右か左上
-                dir = d[random(0,2)];
+                erase(d, rdir);
+                dir = d[random(0,d.size()-1)];
             }else if(dir == 5){                 // 右下に壁がある
                 vector<int> d = {5,6,8};        // 下か左か右下
-                dir = d[random(0,2)];
+                erase(d, rdir);
+                dir = d[random(0,d.size()-1)];
             }else if(dir == 7){                 // 左下に壁がある
                 vector<int> d = {5,6,8};        // 下か左か右下
-                dir = d[random(0,2)];
+                erase(d, rdir);
+                dir = d[random(0,d.size()-1)];
             }else if(dir == 2 || dir == 6){     //上に壁があるとき
-                vector<int> d = {4,8};
-                dir = d[random(0,1)]; // 右か左
+                vector<int> d = {4,8}           // 右か左
+                erase(d, rdir);
+                dir = d[random(0,d.size()-1)]; 
             }else if(dir == 4 || dir == 8){     // 左右に壁があるとき
-                vector<int> d = {2,6};
-                dir = d[random(0,1)];// 上か下
+                vector<int> d = {2,6};          // 上か下
+                erase(d, rdir);
+                dir = d[random(0,d.size()-1)];
             }
         }
         return std::vector<int>(action, dir);
