@@ -50,7 +50,7 @@ void showAction(vector<vector<int> > action){
 int main(int argc, char *argv[]){
     // std::string token = "narae27ec497de2b1d099afa2659f429c4d1cb4eb8ef725f520a05842ff65171"; //大会当日に書き換える
     std::string token = "token"; //大会当日に書き換える
-    // std::string token = "2"; //大会当日に書き換える
+    // std::string token = "token-opp"; //大会当日に書き換える
     std::string id = "1";        // 試合ID
     std::string baseURL = "http://localhost:3000";
     // std::string baseURL = "http://172.28.0.1:8080";
@@ -72,7 +72,7 @@ int main(int argc, char *argv[]){
         masons.push_back(Agent(i, masonsVec[i]));
     }
 
-    plan = match.field.planning();
+    plan = match.field.planning(match.turns);
 
    // ターンのループ開始
     for(int turnCounter = 0; turnCounter < match.turns; turnCounter++){
@@ -83,8 +83,9 @@ int main(int argc, char *argv[]){
 
         // 方策決定
         if(turnCounter%match.turns == 0){
-            plan = match.field.planning();
+            plan = match.field.planning(match.turns - now_turn);
         }else{
+            updatePlan(&plan, &(match.field));
             // plan 維持
         }
 
@@ -106,7 +107,7 @@ int main(int argc, char *argv[]){
             // std::cerr << std::endl;
             // action.push_back(masons[k].action(&(match.field), &plan));
         }
-        // showPlan(&plan);
+        showPlan(&plan);
         showAction(action);
 
 

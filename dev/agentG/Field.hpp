@@ -380,7 +380,7 @@ class Field{
 
             
         }
-        wallplan planning();
+        wallplan planning(int turn);
         int calcTerritoryPoint(wallplan const *plan);
         int updateField(API *api);
 
@@ -428,36 +428,6 @@ void Field::updateFriendMasons(){
     }
 }
 
-
-void showPlan(wallplan const *plan){
-    std::cout << "=========================" << std::endl;
-    std::cout << "width : " << plan->width << std::endl;
-    std::cout << "height: " << plan->height << std::endl;
-    std::cout << "--- wallplan map ---" << std::endl;
-    for(std::vector<int> obj : plan->walls){
-        for(int c : obj){
-            char cell = ' ';
-            switch (c){
-            case 0: //None
-                cell = '.'; break;
-            case 1: //exist wall
-                cell = 'X'; break;
-            case 2: //planed wall
-                cell = '+'; break;
-            case 3: //planed wall
-                cell = '*'; break;
-            default: //その他
-                // cell = '.';
-                cell = '@';
-                break;
-            }
-            std::cout << cell;
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "=========================" << std::endl;
-}
-
 // wallplan planning(fieldmap const *map){ // ダミーデータ
 //     wallplan plan;
 //     plan.width = this->width;
@@ -479,7 +449,7 @@ void showPlan(wallplan const *plan){
 //     return plan;
 // }
 
-wallplan Field::planning(){
+wallplan Field::planning(int turn){
     int width = this->width;
     int height = this->height;
 
@@ -498,7 +468,7 @@ wallplan Field::planning(){
     }
 
     // マップの壁を置く比重(比重の単位は[%])
-    const int BASE_WEIGHT = 70;
+    const int BASE_WEIGHT = 80;
     const int CASTLE_WEIGHT = (BASE_WEIGHT * (100 - abs(this->castleRate - this->wallRate)))/100;
     std::vector<std::vector<int> > weightmap(width, std::vector<int>(height, BASE_WEIGHT));
     for(int i = 0; i < width; i++){
@@ -507,8 +477,7 @@ wallplan Field::planning(){
             if(cell == 2){ //城に壁は建てづらくする
                 weightmap[i][j] = CASTLE_WEIGHT;
             }else if(cell == 1){
-                //4方が池なら建築不可領域
-                bool canBuild = false;
+                bool canBuild = false;//4方が池なら建築不可領域
                 for(int k = 0; k < 4; k++){
                     int x = i + dx4[k];
                     int y = j + dy4[k];
@@ -530,13 +499,82 @@ wallplan Field::planning(){
             }
         }
     }
-
-    //仮壁案をweightmapに基づいて作成
     for(int i = 0; i < width; i++){
         for(int j = 0; j < height; j++){
-            if(plan.walls[i][j] == 1){//既に壁があるならスキップ
-                continue;
-            }else if(random(1,100) <= weightmap[i][j]){
+            int cell = this->area[i][j];
+            if(cell == 2){ //城の周りは必ず城郭(仮城壁)を設ける
+                for(int k = 0; k < 4; k++){
+                    int x = i + dx4[k];
+                    int y = j + dy4[k];
+                    if(x < 0 || x >= width || y < 0 || y >= height){
+                        continue;
+                    }
+                    if(this->area[x][y] != 2){//城が林立している可能性を考慮
+                        weightmap[i][j] = 100;
+
+                    }
+                }
+            }
+        }
+    }
+
+    //仮壁案をweightmapに基づいて作成
+    // 完全ランダム
+    // for(int i = 0; i < width; i++){
+    //     for(int j = 0; j < height; j++){
+    //         if(plan.walls[i][j] == 1){//既に壁があるならスキップ
+    //             continue;
+    //         }else if(random(1,100) <= weightmap[i][j]){
+    //             plan.walls[i][j] = 3; //仮壁案
+    //         }
+    //     }
+    // }
+
+    //　職人付近優遇案
+    std::vector<std::vector<int> > distMap = std::vector<std::vector<int> >(width, std::vector<int>(height, 1000));
+    int distBoarder = 4;
+
+    std::deque<std::pair<int, int> > headM;
+    for(std::pair<int,int> ms: this->friendMasons){
+        headM.push_back(ms);
+        distMap[ms.first][ms.second] = 0;
+    }
+    
+    // 幅優先探索
+    while(!headM.empty()){
+        std::pair<int, int> here = headM.front();
+        int x = here.first;
+        int y = here.second;
+        int dist = distMap[x][y];
+
+        headM.pop_front();
+        if(distMap[x][y] < distBoarder){
+            continue;
+        }
+        if(area[x][y] != 1 ){
+            
+            //4近傍で壁があるかをチェック(field外は除外)
+            for(int k = 0; k < 4; k++){
+                int nx = x + dx4[k];
+                int ny = y + dy4[k];
+                if(nx < 0 || nx >= width || ny < 0 || ny >= height){
+                    continue;
+                }
+                if(dist+1 < distMap[nx][ny]){
+                    distMap[nx][ny] = min(dist+1, distMap[nx][ny]);
+                    if(dist <= distBoarder){
+                        headM.push_back(std::make_pair(nx, ny));
+                    }
+                }
+                
+            }
+        }
+    }
+    for(int i = 0; i < width; i++){
+        for(int j = 0; j < height; j++){
+            if(distMap[i][j] <= distBoarder){//既に壁があるならスキップ
+                plan.walls[i][j] = 3; //職人の近くを壁案とする
+            }else if(random(1,100) <= weightmap[i][j]*0.6){
                 plan.walls[i][j] = 3; //仮壁案
             }
         }
@@ -545,37 +583,37 @@ wallplan Field::planning(){
     // >領域内の壁の削除処理
     // 仮壁込みで領域を塗り潰し
     // マップの外周に4近傍で隣接する領域を領地以外に上書きする(深さ優先探索)
-    std::deque<std::pair<int, int> > head;
+    std::deque<std::pair<int, int> > headE;
     // 外周を始点とする
     for(int i = 0; i < width; i++){
-        head.push_back(std::make_pair(i, 0));
-        head.push_back(std::make_pair(i, height-1));
+        headE.push_back(std::make_pair(i, 0));
+        headE.push_back(std::make_pair(i, height-1));
     }
     for(int j = 1; j < height -1; j++){
-        head.push_back(std::make_pair(0, j));
-        head.push_back(std::make_pair(width-1, j));
+        headE.push_back(std::make_pair(0, j));
+        headE.push_back(std::make_pair(width-1, j));
     }
     // 深さ優先探索
-    while(!head.empty()){
-        std::pair<int, int> here = head.back();
+    while(!headE.empty()){
+        std::pair<int, int> here = headE.back();
         int x = here.first;
         int y = here.second;
         // alart(x, y);
-        head.pop_back();
+        headE.pop_back();
         if(plan.walls[x][y] == 4){
             plan.walls[x][y] = 0; 
             //4近傍を探索(field外は除外)
             if((0< x-1 && x-1 < width-1) && (0< y && y < height-1)){// 上
-                head.push_back(std::make_pair(x-1, y));
+                headE.push_back(std::make_pair(x-1, y));
             }
             if((0< x+1 && x+1 < width-1) && (0< y && y < height-1)){// 下
-                head.push_back(std::make_pair(x+1, y));
+                headE.push_back(std::make_pair(x+1, y));
             }
             if((0< x && x < width-1) && (0< y-1 && y-1 < height-1)){// 左
-                head.push_back(std::make_pair(x, y-1));
+                headE.push_back(std::make_pair(x, y-1));
             }
             if((0< x && x < width-1) && (0< y+1 && y+1 < height-1)){// 右
-                head.push_back(std::make_pair(x, y+1));
+                headE.push_back(std::make_pair(x, y+1));
             }
         }else if(plan.walls[x][y] == 3){
             plan.walls[x][y] = 2; //境界の壁を正式な壁(仮)に変更
@@ -629,11 +667,100 @@ wallplan Field::planning(){
         }
     }
 
+    //外周の壁の数がターン数に対して多すぎる場合減らす．
+    int aroundWalls = 0;
+    for(int i = 0; i < width; i++){
+        for(int j = 0; j < height; j++){
+            if(plan.walls[i][j] == 2){ //外周の壁
+                aroundWalls++;
+            }
+        }
+    }
+    if(aroundWalls > masonNum * turn * 0.3){//
+        //外壁を侵食させる
+        //この段階で 既壁 : 1,  仮壁 : 3, 領域 : 4　で案ができている.
+        //線状の仮壁を削除
+        for(int i = 0; i < width; i++){
+            for(int j = 0; j < height; j++){
+                if(plan.walls[i][j] == 2){// 建築予定壁を削る
+                    for(int k = 0; k < 8; k++){
+                        int x = i + dx8[k];
+                        int y = j + dy8[k];
+                        int target, opposit;
+                        if(x < 0 || x >= width || y < 0 || y >= height){
+                            continue;
+                        }
+                        if(plan.walls[i][j] >= 3){ //仮の壁，領域に外周を譲る
+                            plan.walls[i][j] = 2;
+                        }
+                    }
+                    plan.walls[i][j] = 0;
+                }
+            }
+        }
+        //線状の仮壁を削除
+        for(int i = 0; i < width; i++){
+            for(int j = 0; j < height; j++){
+                if(plan.walls[i][j] >= 1){// 既に壁が存在するならば線状かの判定を行う
+                    bool isLine = false;
+                    for(int k = 0; k < 4; k++){
+                        int x = i + dx8[k];
+                        int xOpp = i + dx8[k+4];
+                        int y = j + dy8[k];
+                        int yOpp = j + dy8[k+4];
+                        int target, opposit;
+
+                        if(x < 0 || x >= width || y < 0 || y >= height){
+                            target = 0;
+                        }else{
+                            target = plan.walls[x][y];
+                        }
+                        if(xOpp < 0 || xOpp >= width || yOpp < 0 || yOpp >= height){
+                            opposit = 0;
+                        }else{
+                            opposit = plan.walls[xOpp][yOpp];
+                        }
+
+                        if(target == 0 && opposit == 0){
+                            isLine = true;
+                            break;
+                        }
+                    }
+                    if(isLine){
+                        plan.walls[i][j] = 0;
+                        for(int k = 0; k < 4; k++){
+                            int x = i + dx4[k];
+                            int y = j + dy4[k];
+                            if(x < 0 || x >= width || y < 0 || y >= height){
+                                continue;
+                            }
+                            if(plan.walls[x][y] > 2){
+                                plan.walls[x][y] = 2;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 城の周りは壁を確実に生成する
+    for(int i = 0; i < width; i++){
+        for(int j = 0; j < height; j++){
+            if(weightmap[i][j] == 100){ //外周の壁
+                plan.walls[i][j] = 2;
+            }
+            if(this->area[i][j] == 2){
+                plan.walls[i][j] = 0;
+            }
+        }
+    }
+
     // 外周以外の仮壁，領域の削除
     for(int i = 0; i < width; i++){
         for(int j = 0; j < height; j++){
-            // if(plan.walls[i][j] > 2){ //仮設定の壁とか領域を削除
-            if(plan.walls[i][j] == 4){ //仮設定の壁とか領域を削除
+            if(plan.walls[i][j] > 2){ //仮設定の壁とか領域を削除
+            // if(plan.walls[i][j] == 4){ //仮設定の壁とか領域を削除
                 plan.walls[i][j] = 0;
             }
         }
@@ -736,6 +863,50 @@ int Field::updateField(API *api){
     // }
     updateFriendMasons();
     return (int)matchData["turn"];
+}
+
+
+
+void showPlan(wallplan const *plan){
+    std::cout << "=========================" << std::endl;
+    std::cout << "width : " << plan->width << std::endl;
+    std::cout << "height: " << plan->height << std::endl;
+    std::cout << "--- wallplan map ---" << std::endl;
+    for(std::vector<int> obj : plan->walls){
+        for(int c : obj){
+            char cell = ' ';
+            switch (c){
+            case 0: //None
+                cell = '.'; break;
+            case 1: //exist wall
+                cell = 'X'; break;
+            case 2: //planed wall
+                cell = '+'; break;
+            case 3: //planed wall
+                cell = '*'; break;
+            default: //その他
+                // cell = '.';
+                cell = '@';
+                break;
+            }
+            std::cout << cell;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "=========================" << std::endl;
+}
+
+void updatePlan(wallplan *plan, Field *map){
+    int width = map->getWidth();
+    int height = map->getHeight();
+    std::vector<std::vector<int> > walls = map->getWalls();
+    for(int i = 0; i < width; i++){
+        for(int j = 0; j < height; j++){
+            if(walls[i][j] == 1) {
+                plan->walls[i][j] = 2;
+            }
+        }
+    }
 }
 
 
