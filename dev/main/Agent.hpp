@@ -296,7 +296,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
             }
         }
         LastDir = dir;
-        return std::vector<int>(action, dir);
+        return std::vector<int>{action, dir};
     }
     LastDir = 2*random(1, 4);
     return std::vector<int>{1,this->LastDir};//最後まで来たらrandom移動
