@@ -48,11 +48,14 @@ void showAction(vector<vector<int> > action){
 }
 
 int main(int argc, char *argv[]){
-    std::string token = "token"; //大会当日に書き換える
+    std::string token = "narae27ec497de2b1d099afa2659f429c4d1cb4eb8ef725f520a05842ff65171"; //大会当日に書き換える
+    // std::string token = "1"; //大会当日に書き換える
+    // std::string token = "2"; //大会当日に書き換える
     std::string id = "1";        // 試合ID
-    std::string baseURL = "http://localhost:3000";
-    // std::string baseURL = "https://www.procon.gr.jp";
+    // std::string baseURL = "http://localhost:3000";
+    std::string baseURL = "http://172.28.0.1:8080";
     int matchNum = atoi(argv[1]);
+    wallplan plan;
 
     // std::cerr << "hoge" << std::endl;
     API api = API(token, id, baseURL);
@@ -71,7 +74,12 @@ int main(int argc, char *argv[]){
         cout << "now turn : " << now_turn << endl;
 
         // 方策決定
-        wallplan plan = match.field.planning();
+        if(turnCounter%5 == 0){
+            plan = match.field.planning();
+        }else{
+            // plan 維持
+        }
+        //  = match.field.planning();
         vector<pair<int, int> > masonsVec = match.field.getFrientMasons();
         int masonNum = match.field.getMasonNum();
         vector<Agent> masons;
@@ -84,13 +92,14 @@ int main(int argc, char *argv[]){
         for(int k = 0; k < masonNum; k++){
             // std::cerr << "hoge" << std::endl;
             action[k] = masons[k].action(&(match.field), &plan);
+            masons[k].showTarget();
             // for (int i = 0; i < action[k].size(); ++i) {
             //     std::cerr << action[k][i] << "; ";
             // }
             // std::cerr << std::endl;
             // action.push_back(masons[k].action(&(match.field), &plan));
         }
-
+        showPlan(&plan);
         showAction(action);
 
 

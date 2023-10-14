@@ -129,16 +129,21 @@ class API{
                 // post
                 res = curl_easy_perform(curl);
                 // 処理結果判定
-                std::cerr << "hoge" << std::endl;
+                // std::cerr << "hoge" << std::endl;
                 j["status_code"] = res;
-                std::cerr << "hoge" << std::endl;
+                // std::cerr << "hoge" << std::endl;
                 if(response == "TooEarly"){ // 競技開始前
-                    std::cerr << "ifhoge" << std::endl;
+                    // std::cerr << "ifhoge" << std::endl;
                     j["status_code"] = -1;
                     j["message"] = "TooEarly";
-                    std::cerr << "hoge" << std::endl;
+                    // std::cerr << "hoge" << std::endl;
                 }else if(res == CURLE_OK){  // 正常処理
-                    std::cerr << response << std::endl;
+                    // std::cerr << response << std::endl;
+                    if(response.size() == 0){
+                        j["status_code"] = res;
+                        j["message"] = "Response_error";
+                        return j;
+                    }
                     j = json::parse(response);
                     j["status_code"] = res;
                     j["message"] = "succeeded";
@@ -146,16 +151,16 @@ class API{
                         postData = post_data;
                         UNIXTIME = j["accepted_at"];
                     }
-                    std::cerr << "hoge" << std::endl;
+                    // std::cerr << "hoge" << std::endl;
                 }else{                      // 接続エラー
-                    std::cerr << "elsehoge" << std::endl;
+                    // std::cerr << "elsehoge" << std::endl;
                     string message =  "failed"  ;
                     j["message"] = message;
                     cout << "failed:" << curl_easy_strerror(res) << endl;
                     j["status_code"] = res;
-                    std::cerr << "hoge" << std::endl;
+                    // std::cerr << "hoge" << std::endl;
                 }
-                std::cerr << "hoge" << std::endl;
+                // std::cerr << "hoge" << std::endl;
 
             }else{                          // 接続エラー
                 cout << "curl_easy_init() failed on " + URL << endl;

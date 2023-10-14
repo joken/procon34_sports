@@ -394,7 +394,7 @@ wallplan Field::planning(){
     }
 
     // マップの壁を置く比重(比重の単位は[%])
-    const int BASE_WEIGHT = 80;
+    const int BASE_WEIGHT = 70;
     const int CASTLE_WEIGHT = (BASE_WEIGHT * (100 - abs(this->castleRate - this->wallRate)))/100;
     std::vector<std::vector<int> > weightmap(width, std::vector<int>(height, BASE_WEIGHT));
     for(int i = 0; i < width; i++){
@@ -528,7 +528,8 @@ wallplan Field::planning(){
     // 外周以外の仮壁，領域の削除
     for(int i = 0; i < width; i++){
         for(int j = 0; j < height; j++){
-            if(plan.walls[i][j] > 2){ //仮設定の壁とか領域を削除
+            // if(plan.walls[i][j] > 2){ //仮設定の壁とか領域を削除
+            if(plan.walls[i][j] == 4){ //仮設定の壁とか領域を削除
                 plan.walls[i][j] = 0;
             }
         }
