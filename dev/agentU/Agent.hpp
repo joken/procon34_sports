@@ -283,6 +283,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
                     int ny = y + dy8[dirs[i]-1] - this->target.second;
                     if(d > nx + ny){
                         dir = dirs[i];
+                        d = nx + ny;
                     }
                 }
             }
