@@ -48,12 +48,12 @@ void showAction(vector<vector<int> > action){
 }
 
 int main(int argc, char *argv[]){
-    // std::string token = "narae27ec497de2b1d099afa2659f429c4d1cb4eb8ef725f520a05842ff65171"; //大会当日に書き換える
-    std::string token = "token"; //大会当日に書き換える
+    std::string token = "narae27ec497de2b1d099afa2659f429c4d1cb4eb8ef725f520a05842ff65171"; //大会当日に書き換える
+    // std::string token = "token"; //大会当日に書き換える
     // std::string token = "token-opp"; //大会当日に書き換える
     std::string id = "1";        // 試合ID
-    std::string baseURL = "http://localhost:3000";
-    // std::string baseURL = "http://172.28.0.1:8080";
+    // std::string baseURL = "http://localhost:3000";
+    std::string baseURL = "http://172.28.0.1:8080";
     int matchNum = atoi(argv[1]);
     wallplan plan;
 
@@ -72,7 +72,45 @@ int main(int argc, char *argv[]){
         masons.push_back(Agent(i, masonsVec[i]));
     }
 
-    plan = match.field.planning(match.turns);
+    // plan = match.field.planning(match.turns);
+    // plan = {
+    //     match.field.getWidth(),
+    //     match.field.getHeight(),
+    //     std::vector<std::vector<int> > {
+    //         std::vector<int>{0,0,0,0,0,0,0,0,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,2,0,2,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,2,0,0,0.2,0,0,0,0},
+    //         std::vector<int>{0,2,2,2,0,0,0,0,0,2,2,2,0},
+    //         std::vector<int>{0,0,0,0,2,0,0,0.2,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,2,0,2,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //         std::vector<int>{0,0,0,0,0,0,0,0,0,0,0,0,0},
+    //     },
+    // };
+    // plan.width = match.field.getWidth();
+    // plan.height = match.field.getHeight(),
+    // std::vector<std::vector<int> > p ={
+    //     {0,0,0,0,0,0,0,0,0,0,0,0,0},
+    //     {0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //     {0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //     {0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //     {0,0,0,0,0,2,0,2,0,0,0,0,0},
+    //     {0,0,0,0,2,0,0,0.2,0,0,0,0},
+    //     {0,2,2,2,0,0,0,0,0,2,2,2,0},
+    //     {0,0,0,0,2,0,0,0.2,0,0,0,0},
+    //     {0,0,0,0,0,2,0,2,0,0,0,0,0},
+    //     {0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //     {0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //     {0,0,0,0,0,0,2,0,0,0,0,0,0},
+    //     {0,0,0,0,0,0,0,0,0,0,0,0,0},
+    // };
+    // plan.walls = p;
+    showPlan(&plan);
 
    // ターンのループ開始
     for(int turnCounter = 0; turnCounter < match.turns; turnCounter++){

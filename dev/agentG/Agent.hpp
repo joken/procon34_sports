@@ -197,7 +197,9 @@ int Agent::targetDistance(std::pair<int, int> tage){
 }
 
 std::vector<int> Agent::breakerAction(Field *map){
-    return {0,0};
+    int action = 1;
+    int dir = random(1,8);
+    return std::vector<int>{action, dir};
 }
 
 

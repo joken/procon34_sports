@@ -510,13 +510,14 @@ wallplan Field::planning(int turn){
                         continue;
                     }
                     if(this->area[x][y] != 2){//城が林立している可能性を考慮
-                        weightmap[i][j] = 100;
+                        weightmap[x][y] = 100;
 
                     }
                 }
             }
         }
     }
+
 
     //仮壁案をweightmapに基づいて作成
     // 完全ランダム
@@ -532,7 +533,7 @@ wallplan Field::planning(int turn){
 
     //　職人付近優遇案
     std::vector<std::vector<int> > distMap = std::vector<std::vector<int> >(width, std::vector<int>(height, 1000));
-    int distBoarder = 4;
+    int distBoarder = 6;
 
     std::deque<std::pair<int, int> > headM;
     for(std::pair<int,int> ms: this->friendMasons){
@@ -574,7 +575,7 @@ wallplan Field::planning(int turn){
         for(int j = 0; j < height; j++){
             if(distMap[i][j] <= distBoarder){//既に壁があるならスキップ
                 plan.walls[i][j] = 3; //職人の近くを壁案とする
-            }else if(random(1,100) <= weightmap[i][j]*0.6){
+            }else if(random(1,100) <= weightmap[i][j]*0.8){
                 plan.walls[i][j] = 3; //仮壁案
             }
         }
