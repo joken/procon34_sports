@@ -14,8 +14,7 @@ class Agent{
 
         void nearWalls(Field *map, wallplan *plan);
         std::vector<int> builderAction(Field *map, wallplan *plan);
-        std::vector<int> rndAction(Field *map, wallplan *plan);
-        std::vector<int> lineAction(Field *map, wallplan *plan);
+    
     public:
         Agent(int id, std::pair<int, int> position){
             this->id = id;
@@ -24,9 +23,6 @@ class Agent{
         }
         std::vector<int> action(Field *map, wallplan *plan);
         void erase(std::vector<int> &v, int key);
-        void showTarget(){
-            std::cout << id << " : " << this->target.first << " , " << this->target.second << std::endl;
-        }
 };
 
 void Agent::nearWalls(Field *map, wallplan *plan){
@@ -82,152 +78,6 @@ void Agent::nearWalls(Field *map, wallplan *plan){
     this->target = std::make_pair(random(0, width-1), random(0, height-1));
     return;
 }
-std::vector<int> Agent::lineAction(Field *map, wallplan *plan){
-    int width = map->getWidth();
-    int height = map->getHeight();
-    std::vector<std::vector<int> > walls = map->getWalls();
-    std::vector<std::vector<int> > area  = map->getArea();
-    map->showWalls();
-    
-    int x = this->position.first;
-    int y = this->position.second;
-    for(int k = 0; k < 8; k++){
-        int nx = x + dx8[k];
-        int ny = y + dy8[k];
-        if(nx < 0 || nx >= width || ny < 0 || ny >= height){
-            continue;
-        }
-        if(area[nx][ny] == 2 && walls[nx][ny] != 2){
-            int action = 1;
-            int dir = k+1;
-
-            if(dir == 0){
-                this->LastDir = 0;
-            }else{
-                this->LastDir = (dir-1 + 4)%8;
-            }
-            return std::vector<int>{action,dir};
-        }
-    }
-    // std::cout <<"--- --- ---" << std::endl;
-    //     for(std::vector<int> obj : walls){
-    //     for(int c : obj){
-    //         char cell = ' ';
-    //         switch (c){
-    //         case 0: //None
-    //             cell = '.'; break;
-    //         case 1: //自陣
-    //             cell = 'f'; break;
-    //         case 2: //相手陣
-    //             cell = 'e'; break;
-    //         default: //その他
-    //             // cell = '.';
-    //             cell = '@';
-    //             break;
-    //         }
-    //         std::cout << cell;
-    //     }
-    //     std::cout << std::endl;
-    // }
-    for(int k = 0; k < 4; k++){
-        int nx = x + dx4[k];
-        int ny = y + dy4[k];
-        if(nx < 0 || nx >= width || ny < 0 || ny >= height){
-            continue;
-        }
-        if(walls[nx][ny] != 1){
-            std::cerr << "aa : "<< walls[nx][ny]<<std::endl;
-            std::cerr <<nx << ", " << ny << std::endl;
-            std::cerr <<x << ", " << y << std::endl;
-            
-            int action = 2;
-            int dir = 2*(k+1);
-
-            if(walls[nx][ny] == 2){
-                int action = 3;
-            }
-            return std::vector<int>{action,dir};
-        }
-    }
-    int rand = random(0,3);
-    for(int k = rand; k < 4+rand; k++){
-        int nx = x + dx8[(k*2)%8];
-        int ny = y + dy4[k*2%8];
-        if(nx < 0 || nx >= width || ny < 0 || ny >= height){
-            continue;
-        }
-        if(walls[nx][ny] != 2){
-            int action = 1;
-            int dir = ((2*k)%8) + 1;
-
-            return std::vector<int>{action,dir};
-        }
-    }
-    int action = 1;
-    int dir = 0;
-    for(int i = 0; i < 500 && dir == 0; i++){
-        dir = random(1,8);
-        if(area[x+dx8[dir-1]][y+dy8[dir-1]] ==1){
-            dir = 0;
-        }else if(walls[x+dx8[dir-1]][y+dy8[dir-1]] == 2){
-            dir = 0;
-        }
-    }
-
-    if(dir == 0){
-        this->LastDir = 0;
-    }else{
-        this->LastDir = (dir-1 + 4)%8;
-    }
-    return std::vector<int>{action,dir};
-}
-std::vector<int> Agent::rndAction(Field *map, wallplan *plan){
-    int width = map->getWidth();
-    int height = map->getHeight();
-    std::vector<std::vector<int> > walls = map->getWalls();
-    std::vector<std::vector<int> > area  = map->getArea();
-    
-    int x = this->position.first;
-    int y = this->position.second;
-    for(int k = 0; k < 4; k++){
-        int nx = x + dx4[k];
-        int ny = y + dy4[k];
-        if(nx < 0 || nx >= width || ny < 0 || ny >= height){
-            continue;
-        }
-        if(plan->walls[nx][ny] >= 2 && walls[nx][ny] != 1 ){
-            int action = 2;//build
-            int dir = 2*(k+1); //4近傍
-
-            if(walls[nx][ny] == 2){ // 相手の壁の時
-                action = 3;
-            }
-            return std::vector<int>{action, dir};
-        }
-        if(walls[nx][ny] == 2){
-            int action = 3;
-            int dir =2*(k+1);
-            return std::vector<int>{action, dir};
-        }
-    }
-    int action = 1;
-    int dir = 0;
-    for(int i = 0; i < 500 && dir == 0; i++){
-        dir = random(1,8);
-        if(area[x+dx8[dir-1]][y+dy8[dir-1]] ==1){
-            dir = 0;
-        }else  if(walls[x+dx8[dir-1]][y+dy8[dir-1]] == 2){
-            dir = 0;
-        }
-    }
-
-    if(dir == 0){
-        this->LastDir = 0;
-    }else{
-        this->LastDir = (dir-1 + 4)%8;
-    }
-    return std::vector<int>{action,dir};
-}
 
 std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
     int width = map->getWidth();
@@ -267,7 +117,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
         int x = this->position.first;
         int y = this->position.second;
         // 壁に沿うように移動する
-        if(area[x + dx8[dir]][y + dy8[dir]] != 1){
+        if(area[x + dx8[dir]][y + dy8[dir]] > 0){
             int rdir = ((LastDir -1)+4 % 8) + 1;
             if(dir == 1){                       // 左上に壁がある
                 vector<int> d = {2,3,8};        // 上か左か右上
@@ -278,7 +128,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
                 erase(d, rdir);
                 dir = d[random(0,d.size()-1)];
             }else if(dir == 5){                 // 右下に壁がある
-                vector<int> d = {7,6,8};        // 下か左か右下
+                vector<int> d = {5,6,8};        // 下か左か右下
                 erase(d, rdir);
                 dir = d[random(0,d.size()-1)];
             }else if(dir == 7){                 // 左下に壁がある
@@ -305,9 +155,7 @@ std::vector<int> Agent::builderAction(Field *map, wallplan *plan){
 std::vector<int> Agent::action(Field *map, wallplan *plan){
     nearWalls(map, plan);
 
-    return lineAction(map, plan);
-    // return rndAction(map, plan);
-    // return builderAction(map, plan);
+    return builderAction(map, plan);
 }
 // 配列要素の削除
 void Agent::erase(std::vector<int> &v, int key){
