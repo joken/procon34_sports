@@ -1,4 +1,5 @@
-*.out
-*.json
+!/matchlog/**
+/dev/**/*.out
+/dev/**/*.json
 .*
 !.gitignore
